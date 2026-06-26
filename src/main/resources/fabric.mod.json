@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "echotooltip",
+  "version": "${version}",
+  "name": "EchoTooltip",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/echotooltip/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "cat.emir.echotooltip.client.EchoTooltipClient"
+    ],
+    "main": [
+      "cat.emir.echotooltip.EchoTooltip"
+    ]
+  },
+  "mixins": [
+    "echotooltip.mixins.json",
+    {
+      "config": "echotooltip.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
