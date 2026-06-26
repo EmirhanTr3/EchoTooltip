@@ -17,7 +17,8 @@ public abstract class AbstractContainerScreenMixin {
             method = "renderTooltip(Lnet/minecraft/client/gui/GuiGraphics;II)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/GuiGraphics;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"
+                    target = "Lnet/minecraft/client/gui/GuiGraphics;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V",
+                    shift = At.Shift.AFTER
             )
     )
     private void echoTooltip$captureItem(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
