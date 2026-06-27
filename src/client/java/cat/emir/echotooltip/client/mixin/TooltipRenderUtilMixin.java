@@ -2,7 +2,7 @@ package cat.emir.echotooltip.client.mixin;
 
 import cat.emir.echotooltip.client.GuiGraphicsTooltipAccess;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -22,15 +22,15 @@ import java.util.Optional;
 public abstract class TooltipRenderUtilMixin {
 
     @Redirect(
-            method = "renderTooltipBackground",
+            method = "extractTooltipBackground",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V",
+                    target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIII)V",
                     ordinal = 1
             )
     )
     private static void echoTooltip$tintFrame(
-            GuiGraphics graphics,
+            GuiGraphicsExtractor graphics,
             RenderPipeline pipeline,
             Identifier sprite,
             int x, int y, int width, int height
@@ -40,7 +40,7 @@ public abstract class TooltipRenderUtilMixin {
     }
 
     @Unique
-    private static int echoTooltip$resolveColor(GuiGraphics graphics) {
+    private static int echoTooltip$resolveColor(GuiGraphicsExtractor graphics) {
         GuiGraphicsTooltipAccess access = (GuiGraphicsTooltipAccess) graphics;
         ItemStack stack = access.echoTooltip$getPendingTooltipItem();
         if (stack != null && !stack.isEmpty()) {

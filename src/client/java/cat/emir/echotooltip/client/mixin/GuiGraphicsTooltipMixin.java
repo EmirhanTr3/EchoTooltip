@@ -3,7 +3,7 @@ package cat.emir.echotooltip.client.mixin;
 import cat.emir.echotooltip.client.ClientTextTooltipAccessor;
 import cat.emir.echotooltip.client.GuiGraphicsTooltipAccess;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.resources.Identifier;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-@Mixin(GuiGraphics.class)
+@Mixin(GuiGraphicsExtractor.class)
 public abstract class GuiGraphicsTooltipMixin implements GuiGraphicsTooltipAccess {
 
     @Unique
@@ -74,7 +74,19 @@ public abstract class GuiGraphicsTooltipMixin implements GuiGraphicsTooltipAcces
     }
 
     @Inject(
-            method = "renderDeferredElements",
+            method = "tooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;)V",
+            at = @At("HEAD")
+    )
+    private void echoTooltip$captureFromDirectTooltip(Font font, List<ClientTooltipComponent> lines, int x, int y,
+                                                      ClientTooltipPositioner positioner, Identifier style, CallbackInfo ci) {
+        if (!this.echoTooltip$itemCaptured) {
+            this.echoTooltip$pendingColor = echoTooltip$extractColorFromComponents(lines);
+        }
+        this.echoTooltip$itemCaptured = false;
+    }
+
+    @Inject(
+            method = "extractDeferredElements",
             at = @At("RETURN")
     )
     private void echoTooltip$clearAfterRender(CallbackInfo ci) {
