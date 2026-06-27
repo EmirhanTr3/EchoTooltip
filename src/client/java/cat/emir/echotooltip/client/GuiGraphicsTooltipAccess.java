@@ -5,4 +5,6 @@ import net.minecraft.world.item.ItemStack;
 public interface GuiGraphicsTooltipAccess {
     ItemStack echoTooltip$getPendingTooltipItem();
     void echoTooltip$setPendingTooltipItem(ItemStack stack);
+    int echoTooltip$getPendingColor();
+    void echoTooltip$setPendingColor(int color);
 }

@@ -2,7 +2,6 @@ package cat.emir.echotooltip.client.mixin;
 
 import cat.emir.echotooltip.client.GuiGraphicsTooltipAccess;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.core.component.DataComponents;
@@ -11,7 +10,9 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.ChatFormatting;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -34,17 +35,23 @@ public abstract class TooltipRenderUtilMixin {
             Identifier sprite,
             int x, int y, int width, int height
     ) {
-        ItemStack stack = ((GuiGraphicsTooltipAccess) graphics).echoTooltip$getPendingTooltipItem();
-        System.out.println("echoTooltip tint: stack=" + (stack != null ? stack.getDisplayName().getString() : "null") + " empty=" + (stack == null || stack.isEmpty()));
-        int color = 0xFFFFFFFF;
-        if (stack != null && !stack.isEmpty()) {
-            color = 0xFF000000 | getItemColor(stack);
-        }
-        graphics.blitSprite(pipeline, sprite, x, y, width, height, color);
+        int color = echoTooltip$resolveColor(graphics);
+        graphics.blitSprite(pipeline, sprite, x, y, width, height, 0xFF000000 | color);
     }
 
-    private static int getItemColor(ItemStack stack) {
-        // name color
+    @Unique
+    private static int echoTooltip$resolveColor(GuiGraphics graphics) {
+        GuiGraphicsTooltipAccess access = (GuiGraphicsTooltipAccess) graphics;
+        ItemStack stack = access.echoTooltip$getPendingTooltipItem();
+        if (stack != null && !stack.isEmpty()) {
+            return echoTooltip$getItemColor(stack);
+        }
+        return access.echoTooltip$getPendingColor();
+    }
+
+    @Unique
+    private static int echoTooltip$getItemColor(ItemStack stack) {
+        // 1. First color in custom name
         Component customName = stack.get(DataComponents.CUSTOM_NAME);
         if (customName != null) {
             int[] found = {-1};
@@ -54,18 +61,13 @@ public abstract class TooltipRenderUtilMixin {
                 }
                 return found[0] == -1 ? Optional.empty() : Optional.of(Unit.INSTANCE);
             }, Style.EMPTY);
-            if (found[0] != -1) {
-                return found[0];
-            }
+            if (found[0] != -1) return found[0];
         }
-
-        // rarity
+        // 2. Rarity color
         ChatFormatting formatting = stack.getRarity().color();
         Integer colorValue = formatting.getColor();
-        if (colorValue != null) {
-            return colorValue;
-        }
-
+        if (colorValue != null) return colorValue;
+        // 3. White fallback
         return 0xFFFFFF;
     }
 }
