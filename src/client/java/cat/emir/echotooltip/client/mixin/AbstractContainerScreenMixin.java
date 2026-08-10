@@ -23,9 +23,9 @@ public abstract class AbstractContainerScreenMixin {
                     shift = At.Shift.AFTER
             )
     )
-    private void echoTooltip$captureFromContainer(GuiGraphicsExtractor guiGraphics, int i, int j, CallbackInfo ci) {
+    private void echoTooltip$captureFromContainer(GuiGraphicsExtractor graphics, int mouseX, int mouseY, CallbackInfo ci) {
         if (hoveredSlot != null && hoveredSlot.hasItem()) {
-            ((GuiGraphicsTooltipAccess) guiGraphics).echoTooltip$setPendingTooltipItem(hoveredSlot.getItem());
+            ((GuiGraphicsTooltipAccess) graphics).echoTooltip$setPendingTooltipItem(hoveredSlot.getItem());
         }
     }
 }

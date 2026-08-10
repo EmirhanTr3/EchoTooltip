@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
@@ -31,12 +32,12 @@ public abstract class TooltipRenderUtilMixin {
     )
     private static void echoTooltip$tintFrame(
             GuiGraphicsExtractor graphics,
-            RenderPipeline pipeline,
-            Identifier sprite,
+            RenderPipeline renderPipeline,
+            Identifier location,
             int x, int y, int width, int height
     ) {
         int color = echoTooltip$resolveColor(graphics);
-        graphics.blitSprite(pipeline, sprite, x, y, width, height, 0xFF000000 | color);
+        graphics.blitSprite(renderPipeline, location, x, y, width, height, 0xFF000000 | color);
     }
 
     @Unique
@@ -51,7 +52,7 @@ public abstract class TooltipRenderUtilMixin {
 
     @Unique
     private static int echoTooltip$getItemColor(ItemStack stack) {
-        // 1. First color in custom name
+        // custom name
         Component customName = stack.get(DataComponents.CUSTOM_NAME);
         if (customName != null) {
             int[] found = {-1};
@@ -63,11 +64,12 @@ public abstract class TooltipRenderUtilMixin {
             }, Style.EMPTY);
             if (found[0] != -1) return found[0];
         }
-        // 2. Rarity color
+
+        // rarity
         ChatFormatting formatting = stack.getRarity().color();
-        Integer colorValue = formatting.getColor();
-        if (colorValue != null) return colorValue;
-        // 3. White fallback
+        TextColor textColor = TextColor.fromLegacyFormat(formatting);
+        if (textColor != null) return textColor.getValue();
+
         return 0xFFFFFF;
     }
 }

@@ -55,8 +55,8 @@ public abstract class GuiGraphicsTooltipMixin implements GuiGraphicsTooltipAcces
             method = "setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;II)V",
             at = @At("HEAD")
     )
-    private void echoTooltip$captureFromItemStack(Font font, ItemStack stack, int x, int y, CallbackInfo ci) {
-        this.echoTooltip$pendingTooltipItem = stack != null ? stack : ItemStack.EMPTY;
+    private void echoTooltip$captureFromItemStack(Font font, ItemStack itemStack, int xo, int yo, CallbackInfo ci) {
+        this.echoTooltip$pendingTooltipItem = itemStack != null ? itemStack : ItemStack.EMPTY;
         this.echoTooltip$itemCaptured = true;
     }
 
@@ -64,11 +64,11 @@ public abstract class GuiGraphicsTooltipMixin implements GuiGraphicsTooltipAcces
             method = "setTooltipForNextFrameInternal",
             at = @At("HEAD")
     )
-    private void echoTooltip$handleInternal(Font font, List<ClientTooltipComponent> list, int i, int j,
-                                            ClientTooltipPositioner positioner, Identifier identifier, boolean bl, CallbackInfo ci) {
+    private void echoTooltip$handleInternal(Font font, List<ClientTooltipComponent> lines, int xo, int yo,
+                                            ClientTooltipPositioner positioner, Identifier style, boolean replaceExisting, CallbackInfo ci) {
         if (!this.echoTooltip$itemCaptured) {
             this.echoTooltip$pendingTooltipItem = ItemStack.EMPTY;
-            this.echoTooltip$pendingColor = echoTooltip$extractColorFromComponents(list);
+            this.echoTooltip$pendingColor = echoTooltip$extractColorFromComponents(lines);
         }
         this.echoTooltip$itemCaptured = false;
     }
@@ -77,7 +77,7 @@ public abstract class GuiGraphicsTooltipMixin implements GuiGraphicsTooltipAcces
             method = "tooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;)V",
             at = @At("HEAD")
     )
-    private void echoTooltip$captureFromDirectTooltip(Font font, List<ClientTooltipComponent> lines, int x, int y,
+    private void echoTooltip$captureFromDirectTooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo,
                                                       ClientTooltipPositioner positioner, Identifier style, CallbackInfo ci) {
         if (!this.echoTooltip$itemCaptured) {
             this.echoTooltip$pendingColor = echoTooltip$extractColorFromComponents(lines);
@@ -98,7 +98,7 @@ public abstract class GuiGraphicsTooltipMixin implements GuiGraphicsTooltipAcces
     @Unique
     private static int echoTooltip$extractColorFromComponents(List<ClientTooltipComponent> components) {
         if (components.isEmpty()) return 0xFFFFFF;
-        ClientTooltipComponent first = components.get(0);
+        ClientTooltipComponent first = components.getFirst();
         if (!(first instanceof ClientTextTooltipAccessor accessor)) return 0xFFFFFF;
         int[] found = {-1};
         accessor.echoTooltip$getText().accept((index, style, codePoint) -> {
