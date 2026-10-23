@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -74,11 +75,10 @@ public abstract class GuiGraphicsTooltipMixin implements GuiGraphicsTooltipAcces
     }
 
     @Inject(
-            method = "tooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;)V",
+            method = "tooltip",
             at = @At("HEAD")
     )
-    private void echoTooltip$captureFromDirectTooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo,
-                                                      ClientTooltipPositioner positioner, Identifier style, CallbackInfo ci) {
+    private void echoTooltip$captureFromDirectTooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo, ClientTooltipPositioner positioner, @Nullable Identifier style, boolean extraSpaceAfterFirstLine, CallbackInfo ci) {
         if (!this.echoTooltip$itemCaptured) {
             this.echoTooltip$pendingColor = echoTooltip$extractColorFromComponents(lines);
         }
